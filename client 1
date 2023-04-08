@@ -1,0 +1,38 @@
+from socket import *
+
+# Specifying the ports and ip
+port = 53
+ip = '127.0.0.1'
+
+# Initialize IPv4 and UDP socket
+serverSocket = socket(AF_INET, SOCK_DGRAM)
+serverSocket.bind(('', port))
+print("Server is listening")
+
+# Define a dictionary to store DNS mappings
+dns_mapping = {
+    'www.example.com': {'A': '192.168.113.62', 'CNAME': 'example.com'},
+    'www.google.com': {'A': '172.217.6.238', 'CNAME': 'google.com'},
+    'www.spotify.com': {'A': '35.186.224.25', 'CNAME': 'spotify.com'},
+    'www.facebook.com': {'A': '69.63.176.13', 'CNAME': 'facebook.com'},
+    'www.youtube.com': {'A': '208.65.153.238', 'CNAME': 'youtube.com'}
+
+}
+
+while True:
+    # Receive query from client
+    query, address = serverSocket.recvfrom(2048)
+
+    # searching in the DNS map
+    if query.decode() in dns_mapping:
+        ADDRESS = dns_mapping[query.decode()]["A"]
+        CNAME = dns_mapping[query.decode()]["CNAME"]
+        message = f"{query.decode()} request \nDirected To address - {ADDRESS} & CNAME - \"{CNAME}\""
+    else:
+        # If the query is not in the dictionary, send an error message to the client
+        message = f"The DNS query '{query.decode()}' does not exist"
+
+    print(message)
+
+    # Send response to client
+    serverSocket.sendto(message.encode(), address)
