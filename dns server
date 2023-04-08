@@ -1,0 +1,25 @@
+import socket
+
+# Specifying the port and IP
+port = 53
+ip = '127.0.0.1'
+
+# Initialize IPv4 and UDP socket
+with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as clientSocket:
+    while True:
+        try:
+            # Get the DNS query from the user
+            query = input("Enter DNS query: ")
+
+            # Send query to the server
+            clientSocket.sendto(query.encode(), (ip, port))
+
+            # Receive response from the server
+            response, address = clientSocket.recvfrom(2048)
+
+            # Print the response
+            print(response.decode())
+        
+        except socket.error as error:
+            print(f"Socket error occurred: {error}")
+            break
